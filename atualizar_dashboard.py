@@ -805,7 +805,7 @@ def main():
 
     print(
         f"Reservas nos nossos apartamentos: "
-        f"{len(linhas)}"
+        f"{sum(1 for linha in linhas if linha.get("no_cadastro_mestre"))}"
     )
 
     print(
