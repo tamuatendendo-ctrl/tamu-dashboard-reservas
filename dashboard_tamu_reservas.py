@@ -594,14 +594,21 @@ for col in [
     if col in df.columns:
         df[col] = df[col].astype(str)
 
-df["ano_num"] = pd.to_numeric(df["ano"], errors="coerce")
-df["mes_num"] = pd.to_numeric(
-    df["mes"].str[-2:],
+# A visão de reservas segue a lógica do Stays: o período da reserva
+# é determinado pela DATA DE CHECK-IN (arrival), não pela data de criação.
+df["checkin"] = pd.to_datetime(df["checkin"], errors="coerce")
+df["checkout"] = pd.to_datetime(df["checkout"], errors="coerce")
+
+# Mantemos também a data de criação separada para análises auxiliares.
+df["ano_criacao"] = pd.to_numeric(df["ano"], errors="coerce")
+df["mes_criacao_num"] = pd.to_numeric(
+    df["mes"].astype(str).str[-2:],
     errors="coerce",
 )
 
-df["checkin"] = pd.to_datetime(df["checkin"], errors="coerce")
-df["checkout"] = pd.to_datetime(df["checkout"], errors="coerce")
+# Filtros e gráficos principais usam check-in.
+df["ano_num"] = df["checkin"].dt.year
+df["mes_num"] = df["checkin"].dt.month
 
 # Detecta status de cancelamento somente se a base fornecer essa informação.
 COLUNA_STATUS = next(
@@ -644,11 +651,10 @@ df["entra_indicadores"] = ~df["status_dashboard"].isin(TIPOS_NAO_RESERVA)
 df["cancelada"] = df["status_dashboard"].eq("canceled")
 df["pre_reserva"] = df["status_dashboard"].eq("reserved")
 
-datas_criacao = pd.to_datetime(
-    df["mes"].astype(str) + "-01",
-    errors="coerce",
-)
-max_mes_historico = datas_criacao.max()
+# O histórico efetivamente disponível para comparação termina no mês atual.
+# A base também contém reservas futuras, portanto não usamos o maior check-in
+# da base como limite histórico.
+max_mes_historico = pd.Timestamp(datetime.now().year, datetime.now().month, 1)
 
 
 # ============================================================
@@ -662,7 +668,7 @@ anos_disponiveis = sorted(
 )
 
 anos_selecionados = st.sidebar.multiselect(
-    "Ano da visão geral",
+    "Ano do check-in",
     anos_disponiveis,
     default=anos_disponiveis,
 )
@@ -687,7 +693,7 @@ meses_disponiveis = sorted(
 )
 
 meses_selecionados = st.sidebar.multiselect(
-    "Mês da visão geral",
+    "Mês do check-in",
     meses_disponiveis,
     default=meses_disponiveis,
     format_func=lambda x: nomes_meses[x],
@@ -707,6 +713,29 @@ canais_sel = st.sidebar.multiselect(
     "Canal da reserva",
     canais,
     default=canais,
+)
+
+# Status seguem os tipos retornados pela API Stays.
+status_disponiveis = [
+    x for x in ["booked", "reserved", "canceled", "blocked", "maintenance", "contract", ""]
+    if x in set(df["status_dashboard"].dropna().astype(str))
+]
+
+status_labels = {
+    "booked": "Reservas (booked)",
+    "reserved": "Pré-reservas (reserved)",
+    "canceled": "Canceladas (canceled)",
+    "blocked": "Bloqueios (blocked)",
+    "maintenance": "Manutenção (maintenance)",
+    "contract": "Contratos (contract)",
+    "": "Sem status",
+}
+
+status_sel = st.sidebar.multiselect(
+    "Status da reserva",
+    status_disponiveis,
+    default=status_disponiveis,
+    format_func=lambda x: status_labels.get(x, x),
 )
 
 aptos_disponiveis = sorted(df["codigo_apto"].dropna().unique())
@@ -756,6 +785,13 @@ if canais_sel:
         df_filtrado["canal"].isin(canais_sel)
     ]
 
+if status_sel:
+    df_filtrado = df_filtrado[
+        df_filtrado["status_dashboard"].isin(status_sel)
+    ]
+else:
+    df_filtrado = df_filtrado.iloc[0:0]
+
 if aptos_sel:
     df_filtrado = df_filtrado[
         df_filtrado["codigo_apto"].isin(aptos_sel)
@@ -781,6 +817,13 @@ if canais_sel:
     df_comparacao = df_comparacao[
         df_comparacao["canal"].isin(canais_sel)
     ]
+
+if status_sel:
+    df_comparacao = df_comparacao[
+        df_comparacao["status_dashboard"].isin(status_sel)
+    ]
+else:
+    df_comparacao = df_comparacao.iloc[0:0]
 
 if aptos_sel:
     df_comparacao = df_comparacao[
@@ -819,7 +862,7 @@ anos_texto = ", ".join(
 st.markdown(
     f'<div style="color:#5E7894;font-size:0.78rem;'
     f'margin-bottom:10px;">'
-    f'Visão atual: {meses_texto or "nenhum mês"} • '
+    f'Visão atual (check-in): {meses_texto or "nenhum mês"} • '
     f'{anos_texto or "nenhum ano"}'
     f'</div>',
     unsafe_allow_html=True,
@@ -916,100 +959,10 @@ if not mensal.empty:
         fill_value=0,
     )
 
-    # --------------------------------------------------------
-    # FUTURO NO MESMO GRÁFICO
-    # --------------------------------------------------------
-    # O histórico é organizado pela data de criação. As reservas
-    # futuras, porém, precisam aparecer no mês do CHECK-IN.
-    # Sem este bloco, uma reserva criada em setembro para
-    # novembro continua sendo contabilizada em setembro e
-    # novembro fica zerado.
-    #
-    # Mantemos setembro como histórico (ex.: 382) e adicionamos
-    # somente os meses posteriores ao mês atual usando check-in,
-    # evitando dupla contagem no mês corrente.
-    hoje_grafico = pd.Timestamp(datetime.now().date())
-
-    futuros_grafico = df.copy()
-
-    if responsaveis_sel:
-        futuros_grafico = futuros_grafico[
-            futuros_grafico["responsavel_apto"].isin(responsaveis_sel)
-        ]
-
-    if canais_sel:
-        futuros_grafico = futuros_grafico[
-            futuros_grafico["canal"].isin(canais_sel)
-        ]
-
-    if aptos_sel:
-        futuros_grafico = futuros_grafico[
-            futuros_grafico["codigo_apto"].isin(aptos_sel)
-        ]
-
-    futuros_grafico = futuros_grafico[
-        futuros_grafico["checkin"].notna()
-        & (futuros_grafico["checkin"] >= hoje_grafico)
-        & futuros_grafico["entra_indicadores"]
-    ].copy()
-
-    if not futuros_grafico.empty:
-        futuros_grafico["ano_checkin"] = futuros_grafico["checkin"].dt.year
-        futuros_grafico["mes_checkin_num"] = futuros_grafico["checkin"].dt.month
-
-        futuros_grafico = futuros_grafico[
-            futuros_grafico["ano_checkin"].isin(anos_selecionados)
-        ]
-
-        if not futuros_grafico.empty:
-            futuros_grafico = futuros_grafico[
-                futuros_grafico["mes_checkin_num"].isin(meses_selecionados)
-            ]
-
-        # Só acrescenta meses posteriores ao mês corrente.
-        # Setembro continua representando o histórico já exibido.
-        if not futuros_grafico.empty:
-            futuro_mensal = (
-                futuros_grafico
-                .assign(
-                    periodo_checkin=futuros_grafico["checkin"].dt.to_period("M")
-                )
-                .groupby("periodo_checkin")
-                .size()
-            )
-
-            periodo_atual = hoje_grafico.to_period("M")
-
-            for periodo, qtd in futuro_mensal.items():
-                if periodo <= periodo_atual:
-                    continue
-
-                ano_futuro = str(periodo.year)
-                mes_futuro = periodo.month
-
-                if ano_futuro not in grafico_mensal.columns:
-                    grafico_mensal[ano_futuro] = 0
-
-                grafico_mensal.loc[mes_futuro, ano_futuro] = int(qtd)
-
-    grafico_mensal = grafico_mensal.reindex(
-        meses_selecionados,
-        fill_value=0,
-    )
-
-    # Mantém os anos selecionados visíveis mesmo quando o mês
-    # futuro ainda não possui reserva.
-    for ano in anos_selecionados:
-        ano_str = str(ano)
-        if ano_str not in grafico_mensal.columns:
-            grafico_mensal[ano_str] = 0
-
-    grafico_mensal = grafico_mensal[[str(ano) for ano in anos_selecionados]]
-
-    grafico_mensal.index = [
-        nomes_meses[x]
-        for x in grafico_mensal.index
-    ]
+    # A série já usa CHECK-IN, inclusive para reservas futuras.
+    # Portanto não somamos uma segunda vez as reservas futuras.
+    # Isso evita a dupla contagem que fazia setembro aparecer como 382
+    # e deixava outubro/novembro/dezembro zerados.
 
     grafico_barras_html(
         grafico_mensal,
@@ -1143,7 +1096,7 @@ st.caption(
 
 st.caption(
     "N/D = mês ainda não disponível no histórico atual. "
-    "O histórico utilizado vai até 28/09/2026."
+    "A evolução e a comparação usam o mês de CHECK-IN; reservas futuras aparecem nos respectivos meses."
 )
 
 
@@ -1919,3 +1872,59 @@ st.write(
 st.write(
     "• Nenhum indicador financeiro é utilizado."
 )
+
+
+# ============================================================
+# 9. STATUS DAS RESERVAS
+# ============================================================
+
+st.markdown(
+    '<div class="tamu-section">9. Status das reservas</div>',
+    unsafe_allow_html=True,
+)
+
+STATUS_LABELS_9 = {
+    "booked": "Reservas",
+    "reserved": "Pré-reservas",
+    "canceled": "Canceladas",
+    "blocked": "Bloqueios",
+    "maintenance": "Manutenção",
+    "contract": "Contratos",
+    "": "Sem status",
+}
+
+status_contagem = (
+    df_filtrado["status_dashboard"]
+    .map(lambda x: STATUS_LABELS_9.get(str(x), str(x) or "Sem status"))
+    .value_counts()
+)
+
+ordem_status = [
+    "Reservas",
+    "Pré-reservas",
+    "Canceladas",
+    "Bloqueios",
+    "Manutenção",
+    "Contratos",
+    "Sem status",
+]
+status_contagem = status_contagem.reindex(
+    [x for x in ordem_status if x in status_contagem.index],
+    fill_value=0,
+)
+
+if len(status_contagem) > 0:
+    cols = st.columns(len(status_contagem))
+    for col, (nome_status, quantidade) in zip(cols, status_contagem.items()):
+        col.metric(nome_status, f"{int(quantidade):,}".replace(",", "."))
+
+    st.caption(
+        "Use o filtro 'Status da reserva' na barra lateral para exibir somente um status, "
+        "por exemplo apenas Canceladas."
+    )
+
+    status_tabela = status_contagem.rename("Quantidade").reset_index()
+    status_tabela.columns = ["Status", "Quantidade"]
+    st.dataframe(status_tabela, use_container_width=True, hide_index=True)
+else:
+    st.info("Nenhum status encontrado para os filtros selecionados.")
