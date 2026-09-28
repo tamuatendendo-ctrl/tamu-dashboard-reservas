@@ -16,6 +16,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from datetime import datetime
 import streamlit.components.v1 as components
 
 
@@ -915,10 +916,95 @@ if not mensal.empty:
         fill_value=0,
     )
 
+    # --------------------------------------------------------
+    # FUTURO NO MESMO GRÁFICO
+    # --------------------------------------------------------
+    # O histórico é organizado pela data de criação. As reservas
+    # futuras, porém, precisam aparecer no mês do CHECK-IN.
+    # Sem este bloco, uma reserva criada em setembro para
+    # novembro continua sendo contabilizada em setembro e
+    # novembro fica zerado.
+    #
+    # Mantemos setembro como histórico (ex.: 382) e adicionamos
+    # somente os meses posteriores ao mês atual usando check-in,
+    # evitando dupla contagem no mês corrente.
+    hoje_grafico = pd.Timestamp(datetime.now().date())
+
+    futuros_grafico = df.copy()
+
+    if responsaveis_sel:
+        futuros_grafico = futuros_grafico[
+            futuros_grafico["responsavel_apto"].isin(responsaveis_sel)
+        ]
+
+    if canais_sel:
+        futuros_grafico = futuros_grafico[
+            futuros_grafico["canal"].isin(canais_sel)
+        ]
+
+    if aptos_sel:
+        futuros_grafico = futuros_grafico[
+            futuros_grafico["codigo_apto"].isin(aptos_sel)
+        ]
+
+    futuros_grafico = futuros_grafico[
+        futuros_grafico["checkin"].notna()
+        & (futuros_grafico["checkin"] >= hoje_grafico)
+        & futuros_grafico["entra_indicadores"]
+    ].copy()
+
+    if not futuros_grafico.empty:
+        futuros_grafico["ano_checkin"] = futuros_grafico["checkin"].dt.year
+        futuros_grafico["mes_checkin_num"] = futuros_grafico["checkin"].dt.month
+
+        futuros_grafico = futuros_grafico[
+            futuros_grafico["ano_checkin"].isin(anos_selecionados)
+        ]
+
+        if not futuros_grafico.empty:
+            futuros_grafico = futuros_grafico[
+                futuros_grafico["mes_checkin_num"].isin(meses_selecionados)
+            ]
+
+        # Só acrescenta meses posteriores ao mês corrente.
+        # Setembro continua representando o histórico já exibido.
+        if not futuros_grafico.empty:
+            futuro_mensal = (
+                futuros_grafico
+                .assign(
+                    periodo_checkin=futuros_grafico["checkin"].dt.to_period("M")
+                )
+                .groupby("periodo_checkin")
+                .size()
+            )
+
+            periodo_atual = hoje_grafico.to_period("M")
+
+            for periodo, qtd in futuro_mensal.items():
+                if periodo <= periodo_atual:
+                    continue
+
+                ano_futuro = str(periodo.year)
+                mes_futuro = periodo.month
+
+                if ano_futuro not in grafico_mensal.columns:
+                    grafico_mensal[ano_futuro] = 0
+
+                grafico_mensal.loc[mes_futuro, ano_futuro] = int(qtd)
+
     grafico_mensal = grafico_mensal.reindex(
         meses_selecionados,
         fill_value=0,
     )
+
+    # Mantém os anos selecionados visíveis mesmo quando o mês
+    # futuro ainda não possui reserva.
+    for ano in anos_selecionados:
+        ano_str = str(ano)
+        if ano_str not in grafico_mensal.columns:
+            grafico_mensal[ano_str] = 0
+
+    grafico_mensal = grafico_mensal[[str(ano) for ano in anos_selecionados]]
 
     grafico_mensal.index = [
         nomes_meses[x]
@@ -1394,8 +1480,6 @@ st.markdown(
 
 # Esta visão usa a data de CHECK-IN, e não a data de criação da reserva.
 # Portanto, uma reserva criada em setembro para dezembro continua aparecendo aqui.
-from datetime import datetime
-
 hoje = pd.Timestamp(datetime.now().date())
 
 filtros_futuros = df.copy()
