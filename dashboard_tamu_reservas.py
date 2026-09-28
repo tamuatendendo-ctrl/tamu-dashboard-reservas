@@ -881,9 +881,13 @@ st.divider()
 
 
 # Indicadores de reservas: exclui bloqueios e manutenção.
-df_filtrado_reservas_reservas = df_filtrado_reservas[
-    df_filtrado_reservas["entra_indicadores"]
-].copy()
+# `df_filtrado_reservas` é a base filtrada pelos mesmos filtros
+# da visão principal, mas sem bloqueios/manutenção.
+df_filtrado_reservas = df_filtrado[df_filtrado["entra_indicadores"]].copy()
+
+# Alias mantido para compatibilidade com os blocos que usam
+# o nome antigo durante a evolução do dashboard.
+df_filtrado_reservas_reservas = df_filtrado_reservas.copy()
 
 # ============================================================
 # 1. EVOLUÇÃO
