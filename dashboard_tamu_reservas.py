@@ -1338,12 +1338,126 @@ st.dataframe(
 
 
 # ============================================================
-# ============================================================
-# 6. APARTAMENTOS SEM RESERVAS NO PERÍODO
+# 6. RESERVAS FUTURAS — BASEADA NO CHECK-IN
 # ============================================================
 
 st.markdown(
-    '<div class="tamu-section">6. Apartamentos sem reservas no período</div>',
+    '<div class="tamu-section">6. Reservas futuras</div>',
+    unsafe_allow_html=True,
+)
+
+# Esta visão usa a data de CHECK-IN, e não a data de criação da reserva.
+# Portanto, uma reserva criada em setembro para dezembro continua aparecendo aqui.
+from datetime import datetime
+
+hoje = pd.Timestamp(datetime.now().date())
+
+filtros_futuros = df.copy()
+
+if responsaveis_sel:
+    filtros_futuros = filtros_futuros[
+        filtros_futuros["responsavel_apto"].isin(responsaveis_sel)
+    ]
+
+if canais_sel:
+    filtros_futuros = filtros_futuros[
+        filtros_futuros["canal"].isin(canais_sel)
+    ]
+
+if aptos_sel:
+    filtros_futuros = filtros_futuros[
+        filtros_futuros["codigo_apto"].isin(aptos_sel)
+    ]
+
+futuros = filtros_futuros[
+    filtros_futuros["checkin"].notna()
+    & (filtros_futuros["checkin"] >= hoje)
+].copy()
+
+if not futuros.empty:
+    futuros["mes_checkin"] = futuros["checkin"].dt.to_period("M").astype(str)
+
+    # Mostra os próximos 12 meses com reservas existentes.
+    futuros_mensal = (
+        futuros.groupby("mes_checkin")
+        .size()
+        .rename("Reservas")
+        .sort_index()
+    )
+
+    f1, f2, f3 = st.columns(3)
+
+    f1.metric(
+        "Reservas futuras",
+        f"{len(futuros):,}".replace(",", "."),
+    )
+
+    f2.metric(
+        "Check-ins futuros",
+        f"{futuros["checkin"].dt.date.nunique():,}".replace(",", "."),
+    )
+
+    f3.metric(
+        "Apartamentos com reserva futura",
+        str(futuros["codigo_apto"].nunique()),
+    )
+
+    grafico_futuro = futuros_mensal.head(12).copy()
+    grafico_futuro.index = [
+        pd.Period(x, freq="M").strftime("%m/%Y")
+        for x in grafico_futuro.index
+    ]
+
+    grafico_barras_html(
+        grafico_futuro,
+        titulo="Reservas futuras por mês de check-in",
+        ylabel="Quantidade de reservas",
+    )
+
+    detalhe_futuro = futuros[
+        [
+            "codigo_apto",
+            "responsavel_apto",
+            "canal",
+            "checkin",
+            "checkout",
+            "responsavel_reserva",
+        ]
+    ].copy()
+
+    detalhe_futuro["checkin"] = detalhe_futuro["checkin"].dt.strftime("%d/%m/%Y")
+    detalhe_futuro["checkout"] = detalhe_futuro["checkout"].dt.strftime("%d/%m/%Y")
+
+    detalhe_futuro = detalhe_futuro.sort_values(
+        ["checkin", "codigo_apto"]
+    )
+
+    st.subheader("Próximas reservas")
+    st.dataframe(
+        detalhe_futuro,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    st.caption(
+        "Esta seção é independente dos filtros de ano/mês da criação. "
+        "Ela considera os filtros de responsável, canal e apartamento, "
+        "mas organiza as reservas pela data de check-in."
+    )
+
+else:
+    st.info(
+        "Não existem reservas futuras na base atual para os filtros selecionados."
+    )
+
+
+# ============================================================
+# 7. APARTAMENTOS SEM RESERVAS NO PERÍODO
+# ============================================================
+
+
+st.markdown(
+    '<div class="tamu-section">7. Apartamentos sem reservas no período</div>',
     unsafe_allow_html=True,
 )
 
@@ -1581,10 +1695,10 @@ else:
     )
 
 
-# 7. CADASTRO DA OPERAÇÃO
+# 8. CADASTRO DA OPERAÇÃO
 # ============================================================
 
-st.markdown('<div class="tamu-section">7. Cadastro da operação</div>', unsafe_allow_html=True)
+st.markdown('<div class="tamu-section">8. Cadastro da operação</div>', unsafe_allow_html=True)
 
 if not aptos.empty:
 
