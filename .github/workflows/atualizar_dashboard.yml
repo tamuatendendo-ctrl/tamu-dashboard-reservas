@@ -1,0 +1,44 @@
+name: Atualizar Dashboard TAMU
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: |
+          pip install requests pandas
+
+      - name: Atualizar dados da dashboard
+        env:
+          STAYS_LOGIN: ${{ secrets.STAYS_LOGIN }}
+          STAYS_SENHA: ${{ secrets.STAYS_SENHA }}
+        run: |
+          python atualizar_dashboard.py
+
+      - name: Salvar dados atualizados
+        run: |
+          git config user.name "TAMU Dashboard Bot"
+          git config user.email "tamu-dashboard@users.noreply.github.com"
+
+          git add analise_reservas_apartamentos.json
+
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração nos dados."
+          else
+            git commit -m "Atualização automática das reservas"
+            git push
+          fi
