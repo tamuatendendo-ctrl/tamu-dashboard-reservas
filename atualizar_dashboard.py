@@ -4,8 +4,8 @@
 TAMU — Atualização automática da Dashboard
 
 Consulta a API Stays usando a data de criação da reserva,
-reconstrói o histórico e mantém as informações dos 72
-apartamentos da operação.
+reconstrói o histórico e mantém as informações do cadastro mestre
+dos 72 apartamentos da operação.
 
 Independente do New_monitor_reservas.py.
 """
@@ -230,6 +230,16 @@ def id_reserva(reserva):
     ).strip()
 
 
+def normalizar_codigo_apto(codigo):
+
+    # A Stays pode retornar o mesmo apartamento com espaços
+    # internos (ex.: "161136 A"), enquanto o cadastro mestre
+    # usa "161136A".
+    return "".join(
+        str(codigo or "").upper().split()
+    )
+
+
 def codigo_apartamento(reserva):
 
     listing = (
@@ -243,7 +253,7 @@ def codigo_apartamento(reserva):
         or ""
     )
 
-    return str(codigo).strip().upper()
+    return normalizar_codigo_apto(codigo)
 
 
 def canal_reserva(reserva):
@@ -297,6 +307,14 @@ def data_checkout(reserva):
 
 def status_reserva(reserva):
 
+    # Na API Stays, o estado operacional da reserva vem em
+    # "type" (booked, reserved, canceled, blocked, maintenance).
+    # Os campos status/reservationStatus/bookingStatus podem vir vazios.
+    valor = reserva.get("type")
+
+    if valor:
+        return str(valor).strip().lower()
+
     valor = (
         reserva.get("status")
         or reserva.get("reservationStatus")
@@ -305,14 +323,13 @@ def status_reserva(reserva):
     )
 
     if isinstance(valor, dict):
-
         valor = (
             valor.get("name")
             or valor.get("status")
             or ""
         )
 
-    return str(valor)
+    return str(valor).strip().lower()
 
 
 # ============================================================
@@ -361,35 +378,43 @@ def main():
         )
 
     # --------------------------------------------------------
-    # LER BASE ATUAL DOS 72 APARTAMENTOS
+    # LER CADASTRO MESTRE DOS 72 APARTAMENTOS
     # --------------------------------------------------------
+    # O cadastro mestre é a fonte oficial da operação.
+    # Não usamos a lista de "apartamentos" do JSON analítico,
+    # pois ela pode ter sido reduzida por cruzamentos anteriores.
+
+    ARQUIVO_MESTRE = "apartamentos_mestre.json"
+
+    if not os.path.exists(ARQUIVO_MESTRE):
+        raise RuntimeError(
+            f"{ARQUIVO_MESTRE} não encontrado. "
+            "Mantenha o cadastro mestre no mesmo diretório."
+        )
 
     with open(
-        ARQUIVO_ANALISE,
+        ARQUIVO_MESTRE,
         encoding="utf-8",
     ) as f:
+        mestre_data = json.load(f)
 
-        analise_atual = json.load(f)
-
-    apartamentos = analise_atual.get(
+    apartamentos = mestre_data.get(
         "apartamentos",
-        [],
-    )
+        []
+    ) if isinstance(mestre_data, dict) else mestre_data
 
     if not apartamentos:
-
         raise RuntimeError(
-            "A base atual não contém "
-            "os apartamentos da operação."
+            "O cadastro mestre não contém apartamentos da operação."
         )
 
     apt_por_codigo = {
-        str(
+        normalizar_codigo_apto(
             apto.get(
                 "codigo_apto",
                 "",
             )
-        ).strip().upper(): apto
+        ): apto
         for apto in apartamentos
     }
 
@@ -492,7 +517,7 @@ def main():
                 reserva
             )
 
-            if rid:
+            if rid and rid not in todas_reservas:
                 todas_reservas[rid] = reserva
 
         cursor = proximo_mes(
@@ -595,6 +620,11 @@ def main():
                 status_reserva(
                     reserva
                 ),
+
+            "tipo":
+                status_reserva(
+                    reserva
+                ),
         }
 
         linhas.append(
@@ -637,6 +667,12 @@ def main():
         )
 
         if not info:
+            continue
+
+        # Apenas reservas efetivas entram nos indicadores de
+        # volume/performance. Bloqueios e manutenção são eventos
+        # operacionais do calendário, não reservas.
+        if linha.get("status") in {"blocked", "maintenance"}:
             continue
 
         info["reservas_total"] += 1
@@ -712,6 +748,21 @@ def main():
 
             "reservas_sem_apto":
                 len(reservas_sem_apto),
+
+            "reservas_booked":
+                sum(1 for linha in linhas if linha.get("status") == "booked"),
+
+            "reservas_reserved":
+                sum(1 for linha in linhas if linha.get("status") == "reserved"),
+
+            "reservas_canceled":
+                sum(1 for linha in linhas if linha.get("status") == "canceled"),
+
+            "reservas_blocked":
+                sum(1 for linha in linhas if linha.get("status") == "blocked"),
+
+            "reservas_maintenance":
+                sum(1 for linha in linhas if linha.get("status") == "maintenance"),
         },
 
         "reservas":
@@ -759,6 +810,15 @@ def main():
     print(
         f"Reservas sem apartamento: "
         f"{len(reservas_sem_apto)}"
+    )
+
+    print(
+        "Tipos: "
+        f"booked={sum(1 for linha in linhas if linha.get('status') == 'booked')}, "
+        f"reserved={sum(1 for linha in linhas if linha.get('status') == 'reserved')}, "
+        f"canceled={sum(1 for linha in linhas if linha.get('status') == 'canceled')}, "
+        f"blocked={sum(1 for linha in linhas if linha.get('status') == 'blocked')}, "
+        f"maintenance={sum(1 for linha in linhas if linha.get('status') == 'maintenance')}"
     )
 
     print(
