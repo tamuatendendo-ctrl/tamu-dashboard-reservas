@@ -643,11 +643,16 @@ elif "status" in df.columns:
         .replace({"nan": ""})
     )
 
-# Para os indicadores de reservas, bloqueios e manutenção não são reservas.
-# Canceladas e pré-reservas ficam identificadas separadamente.
+# Para os indicadores de volume, bloqueios e manutenção não são reservas.
+# Reservas feitas e pré-reservas entram no volume normal.
+# Canceladas ficam disponíveis no filtro/status, mas não entram na evolução.
+#
+# IMPORTANTE: bases antigas podem não ter o campo `tipo` preenchido.
+# Nessa situação, não podemos zerar a evolução inteira: registros sem
+# status continuam sendo tratados como reservas legadas.
 TIPOS_NAO_RESERVA = {"blocked", "maintenance"}
 TIPOS_RESERVA = {"booked", "reserved", "canceled"}
-df["entra_indicadores"] = df["status_dashboard"].isin({"booked", "reserved"})
+df["entra_indicadores"] = ~df["status_dashboard"].isin(TIPOS_NAO_RESERVA | {"canceled"})
 df["cancelada"] = df["status_dashboard"].eq("canceled")
 df["pre_reserva"] = df["status_dashboard"].eq("reserved")
 
@@ -726,9 +731,15 @@ STATUS_LABELS = {
     "contract": "Contratos",
 }
 
+# As opções são fixas para o usuário sempre poder selecionar o status,
+# mesmo enquanto a base antiga ainda não foi regenerada pelo updater.
 status_disponiveis = [
-    x for x in ["booked", "reserved", "canceled", "blocked", "maintenance", "contract"]
-    if x in set(df["status_dashboard"].dropna().astype(str))
+    "booked",
+    "reserved",
+    "canceled",
+    "contract",
+    "blocked",
+    "maintenance",
 ]
 
 status_opcoes = ["Todos"] + status_disponiveis
@@ -1878,6 +1889,9 @@ st.write(
 
 # ============================================================
 # 9. STATUS DAS RESERVAS
+
+# ============================================================
+# 9. STATUS DAS RESERVAS
 # ============================================================
 
 st.markdown(
@@ -1885,8 +1899,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Esta seção mostra os tipos da Stays para o período/filtros selecionados.
-# "Reservas feitas" = type=booked. Canceladas = type=canceled.
+# A contagem usa diretamente o `type` da API Stays.
+# booked = reserva feita; canceled = cancelada.
 status_ordem = [
     "booked",
     "reserved",
@@ -1896,82 +1910,29 @@ status_ordem = [
     "maintenance",
 ]
 
-status_contagem = (
-    df_filtrado["status_dashboard"]
-    .value_counts()
-    .to_dict()
-)
+status_contagem = df_filtrado["status_dashboard"].value_counts().to_dict()
 
-status_visiveis = [
-    status for status in status_ordem
-    if status in status_contagem
-]
+# Mostra sempre os principais status para deixar claro o valor de cada um,
+# inclusive quando algum deles for zero no período selecionado.
+status_visiveis = status_ordem.copy()
 
-if status_visiveis:
-    cols = st.columns(len(status_visiveis))
-    for col, status in zip(cols, status_visiveis):
-        col.metric(
-            STATUS_LABELS.get(status, status),
-            f"{int(status_contagem.get(status, 0)):,}".replace(",", "."),
-        )
-
-    st.caption(
-        "A contagem segue o campo type da API Stays e o período é definido pelo check-in. "
-        "Use o filtro lateral para exibir somente Reservas feitas ou Canceladas."
-    )
-else:
-    st.info("Nenhuma reserva com status disponível para os filtros selecionados.")
-
-
-# ============================================================
-
-st.markdown(
-    '<div class="tamu-section">9. Status das reservas</div>',
-    unsafe_allow_html=True,
-)
-
-STATUS_LABELS_9 = {
-    "booked": "Reservas",
-    "reserved": "Pré-reservas",
-    "canceled": "Canceladas",
-    "blocked": "Bloqueios",
-    "maintenance": "Manutenção",
-    "contract": "Contratos",
-    "": "Sem status",
-}
-
-status_contagem = (
-    df_filtrado["status_dashboard"]
-    .map(lambda x: STATUS_LABELS_9.get(str(x), str(x) or "Sem status"))
-    .value_counts()
-)
-
-ordem_status = [
-    "Reservas",
-    "Pré-reservas",
-    "Canceladas",
-    "Bloqueios",
-    "Manutenção",
-    "Contratos",
-    "Sem status",
-]
-status_contagem = status_contagem.reindex(
-    [x for x in ordem_status if x in status_contagem.index],
-    fill_value=0,
-)
-
-if len(status_contagem) > 0:
-    cols = st.columns(len(status_contagem))
-    for col, (nome_status, quantidade) in zip(cols, status_contagem.items()):
-        col.metric(nome_status, f"{int(quantidade):,}".replace(",", "."))
-
-    st.caption(
-        "Use o filtro 'Status da reserva' na barra lateral para exibir somente um status, "
-        "por exemplo apenas Canceladas."
+cols = st.columns(len(status_visiveis))
+for col, status in zip(cols, status_visiveis):
+    col.metric(
+        STATUS_LABELS.get(status, status),
+        f"{int(status_contagem.get(status, 0)):,}".replace(",", "."),
     )
 
-    status_tabela = status_contagem.rename("Quantidade").reset_index()
-    status_tabela.columns = ["Status", "Quantidade"]
-    st.dataframe(status_tabela, use_container_width=True, hide_index=True)
-else:
-    st.info("Nenhum status encontrado para os filtros selecionados.")
+status_sem_status = int(status_contagem.get("", 0))
+if status_sem_status:
+    st.caption(
+        f"Registros sem status na base atual: {status_sem_status:,}. "
+        "Isso normalmente indica uma base anterior à atualização do campo type."
+        .replace(",", ".")
+    )
+
+st.caption(
+    "Período definido pelo check-in. "
+    "Use o filtro lateral para selecionar individualmente Reservas feitas, "
+    "Canceladas, Pré-reservas, Contratos, Bloqueios ou Manutenção."
+)
