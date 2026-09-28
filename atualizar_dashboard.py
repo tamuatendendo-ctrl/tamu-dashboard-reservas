@@ -34,6 +34,11 @@ ARQUIVO_ANALISE = "analise_reservas_apartamentos.json"
 DATA_INICIO = date(2025, 1, 1)
 DATA_FIM = date.today()
 
+# Reservas futuras: consulta por data de check-in (arrival).
+# Mantemos 12 meses à frente para alimentar a seção de reservas futuras.
+DATA_INICIO_FUTURO = date.today()
+DATA_FIM_FUTURO = date.today() + timedelta(days=365)
+
 TIMEOUT = 180
 TENTATIVAS = 3
 
@@ -132,12 +137,13 @@ def consultar_periodo(
     session,
     inicio,
     fim,
+    date_type="creation",
 ):
 
     payload = {
         "from": inicio.isoformat(),
         "to": fim.isoformat(),
-        "dateType": "creation",
+        "dateType": date_type,
     }
 
     ultimo_erro = None
@@ -152,7 +158,7 @@ def consultar_periodo(
             print(
                 f"Consultando "
                 f"{inicio} -> {fim} "
-                f"(tentativa "
+                f"(dateType={date_type}, tentativa "
                 f"{tentativa}/{TENTATIVAS})"
             )
 
@@ -400,6 +406,10 @@ def main():
 
     todas_reservas = {}
 
+    # --------------------------------------------------------
+    # HISTÓRICO — DATA DE CRIAÇÃO
+    # --------------------------------------------------------
+
     cursor = DATA_INICIO
 
     while cursor <= DATA_FIM:
@@ -417,6 +427,7 @@ def main():
             session,
             inicio,
             fim,
+            date_type="creation",
         )
 
         for reserva in reservas:
@@ -432,13 +443,69 @@ def main():
             inicio
         )
 
+    print()
+    print(
+        f"Reservas únicas após histórico: "
+        f"{len(todas_reservas)}"
+    )
+
+    # --------------------------------------------------------
+    # FUTURO — DATA DE CHECK-IN (ARRIVAL)
+    # --------------------------------------------------------
+    #
+    # Esta segunda consulta é necessária porque a busca por
+    # creation não é suficiente para alimentar os meses futuros.
+    # A API Stays aceita dateType=arrival para buscar pela data
+    # de check-in.
+    #
+
+    print()
+    print(
+        "Consultando reservas futuras por check-in "
+        f"({DATA_INICIO_FUTURO} -> {DATA_FIM_FUTURO})"
+    )
+
+    cursor = primeiro_dia_mes(DATA_INICIO_FUTURO)
+
+    while cursor <= DATA_FIM_FUTURO:
+
+        inicio = max(
+            primeiro_dia_mes(cursor),
+            DATA_INICIO_FUTURO,
+        )
+
+        fim = min(
+            ultimo_dia_mes(cursor),
+            DATA_FIM_FUTURO,
+        )
+
+        reservas_futuras = consultar_periodo(
+            session,
+            inicio,
+            fim,
+            date_type="arrival",
+        )
+
+        for reserva in reservas_futuras:
+
+            rid = id_reserva(
+                reserva
+            )
+
+            if rid:
+                todas_reservas[rid] = reserva
+
+        cursor = proximo_mes(
+            cursor
+        )
+
     reservas = list(
         todas_reservas.values()
     )
 
     print()
     print(
-        f"Reservas únicas encontradas: "
+        f"Reservas únicas após histórico + futuro: "
         f"{len(reservas)}"
     )
 
@@ -631,6 +698,14 @@ def main():
 
             "reservas_historico":
                 len(reservas),
+
+            "reservas_futuras_checkin":
+                sum(
+                    1
+                    for linha in linhas
+                    if linha.get("checkin")
+                    and linha.get("checkin") >= date.today().isoformat()
+                ),
 
             "reservas_nossos_aptos":
                 len(linhas),
