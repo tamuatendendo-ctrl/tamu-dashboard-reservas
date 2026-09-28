@@ -8,6 +8,7 @@
   },
   "totais": {
     "reservas_historico": 8099,
+    "reservas_futuras_checkin": 320,
     "reservas_nossos_aptos": 6385,
     "reservas_sem_apto": 1714
   },
