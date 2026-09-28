@@ -602,6 +602,14 @@ df["mes_num"] = pd.to_numeric(
 df["checkin"] = pd.to_datetime(df["checkin"], errors="coerce")
 df["checkout"] = pd.to_datetime(df["checkout"], errors="coerce")
 
+# Datas derivadas do CHECK-IN.
+# A evolução/comparação usa o mês da hospedagem, não o mês em que
+# a reserva foi criada. Isso permite comparar, por exemplo,
+# Novembro/2025 x Novembro/2026 mesmo quando a reserva de 2026
+# foi criada meses antes.
+df["ano_checkin"] = df["checkin"].dt.year
+df["mes_checkin_num"] = df["checkin"].dt.month
+
 # Detecta status de cancelamento somente se a base fornecer essa informação.
 COLUNA_STATUS = next(
     (
@@ -740,12 +748,47 @@ if aptos_sel:
     ]
 
 
-# Base específica para comparação 2025 x 2026.
+# Base específica para a EVOLUÇÃO e comparação 2025 x 2026.
+# Aqui o período é definido pelo CHECK-IN.
+df_evolucao = df.copy()
+
+if meses_selecionados:
+    df_evolucao = df_evolucao[
+        df_evolucao["mes_checkin_num"].isin(meses_selecionados)
+    ]
+else:
+    df_evolucao = df_evolucao.iloc[0:0]
+
+if anos_selecionados:
+    df_evolucao = df_evolucao[
+        df_evolucao["ano_checkin"].isin(anos_selecionados)
+    ]
+else:
+    df_evolucao = df_evolucao.iloc[0:0]
+
+if responsaveis_sel:
+    df_evolucao = df_evolucao[
+        df_evolucao["responsavel_apto"].isin(responsaveis_sel)
+    ]
+
+if canais_sel:
+    df_evolucao = df_evolucao[
+        df_evolucao["canal"].isin(canais_sel)
+    ]
+
+if aptos_sel:
+    df_evolucao = df_evolucao[
+        df_evolucao["codigo_apto"].isin(aptos_sel)
+    ]
+
+# Comparação 2025 x 2026 também usa CHECK-IN.
+# Não depende do filtro "Ano da visão geral", porque precisa manter
+# os dois anos simultaneamente para fazer a comparação.
 df_comparacao = df.copy()
 
 if meses_selecionados:
     df_comparacao = df_comparacao[
-        df_comparacao["mes_num"].isin(meses_selecionados)
+        df_comparacao["mes_checkin_num"].isin(meses_selecionados)
     ]
 else:
     df_comparacao = df_comparacao.iloc[0:0]
@@ -866,16 +909,16 @@ st.divider()
 st.markdown('<div class="tamu-section">1. Evolução das reservas</div>', unsafe_allow_html=True)
 
 mensal = (
-    df_filtrado
-    .groupby(["ano_num", "mes_num"])
+    df_evolucao
+    .groupby(["ano_checkin", "mes_checkin_num"])
     .size()
     .reset_index(name="Reservas")
 )
 
 if not mensal.empty:
 
-    mensal["Ano"] = mensal["ano_num"].astype(int).astype(str)
-    mensal["Mês"] = mensal["mes_num"].astype(int)
+    mensal["Ano"] = mensal["ano_checkin"].astype(int).astype(str)
+    mensal["Mês"] = mensal["mes_checkin_num"].astype(int)
 
     grafico_mensal = mensal.pivot_table(
         index="Mês",
@@ -890,6 +933,17 @@ if not mensal.empty:
         fill_value=0,
     )
 
+    # Garante que os anos selecionados apareçam mesmo quando um deles
+    # ainda não possui reservas no mês escolhido.
+    for ano in anos_selecionados:
+        ano_str = str(ano)
+        if ano_str not in grafico_mensal.columns:
+            grafico_mensal[ano_str] = 0
+
+    grafico_mensal = grafico_mensal[
+        [str(ano) for ano in anos_selecionados]
+    ]
+
     grafico_mensal.index = [
         nomes_meses[x]
         for x in grafico_mensal.index
@@ -897,8 +951,14 @@ if not mensal.empty:
 
     grafico_barras_html(
         grafico_mensal,
-        titulo="Reservas por mês",
+        titulo="Reservas por mês de check-in",
         ylabel="Quantidade de reservas",
+    )
+
+    st.caption(
+        "A evolução considera o mês do check-in. "
+        "Assim, reservas futuras já confirmadas entram na comparação "
+        "mesmo que tenham sido criadas meses antes."
     )
 
 
@@ -935,14 +995,9 @@ comp.columns = [
     "2026",
 ]
 
-# Não transformar meses futuros em -100%.
-if max_mes_historico.year == 2026:
-    mes_limite_2026 = max_mes_historico.month
-
-    for mes in comp.index:
-        if mes > mes_limite_2026:
-            comp.loc[mes, "2026"] = pd.NA
-
+# Como a comparação é baseada em CHECK-IN, meses futuros podem
+# ter valores reais já reservados. Portanto, não transformamos
+# Outubro/Novembro/Dezembro de 2026 em N/D.
 comp["Variação"] = pd.NA
 
 for mes in comp.index:
@@ -1022,12 +1077,8 @@ else:
     )
 
 st.caption(
-    "A comparação utiliza somente os meses selecionados no filtro lateral."
-)
-
-st.caption(
-    "N/D = mês ainda não disponível no histórico atual. "
-    "O histórico utilizado vai até 28/09/2026."
+    "A comparação utiliza o mês de CHECK-IN. "
+    "Assim, 2025 × 2026 compara o mesmo mês de hospedagem nos dois anos."
 )
 
 
