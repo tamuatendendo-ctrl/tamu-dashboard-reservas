@@ -647,7 +647,7 @@ elif "status" in df.columns:
 # Canceladas e pré-reservas ficam identificadas separadamente.
 TIPOS_NAO_RESERVA = {"blocked", "maintenance"}
 TIPOS_RESERVA = {"booked", "reserved", "canceled"}
-df["entra_indicadores"] = ~df["status_dashboard"].isin(TIPOS_NAO_RESERVA)
+df["entra_indicadores"] = df["status_dashboard"].isin({"booked", "reserved"})
 df["cancelada"] = df["status_dashboard"].eq("canceled")
 df["pre_reserva"] = df["status_dashboard"].eq("reserved")
 
@@ -668,7 +668,7 @@ anos_disponiveis = sorted(
 )
 
 anos_selecionados = st.sidebar.multiselect(
-    "Ano do check-in",
+    "Ano da visão geral",
     anos_disponiveis,
     default=anos_disponiveis,
 )
@@ -693,7 +693,7 @@ meses_disponiveis = sorted(
 )
 
 meses_selecionados = st.sidebar.multiselect(
-    "Mês do check-in",
+    "Mês da visão geral",
     meses_disponiveis,
     default=meses_disponiveis,
     format_func=lambda x: nomes_meses[x],
@@ -715,27 +715,29 @@ canais_sel = st.sidebar.multiselect(
     default=canais,
 )
 
-# Status seguem os tipos retornados pela API Stays.
+# Status seguem exatamente o campo `type` retornado pela API Stays.
+# O filtro é opcional: "Todos" mantém a visão completa.
+STATUS_LABELS = {
+    "booked": "Reservas feitas",
+    "reserved": "Pré-reservas",
+    "canceled": "Canceladas",
+    "blocked": "Bloqueios",
+    "maintenance": "Manutenção",
+    "contract": "Contratos",
+}
+
 status_disponiveis = [
-    x for x in ["booked", "reserved", "canceled", "blocked", "maintenance", "contract", ""]
+    x for x in ["booked", "reserved", "canceled", "blocked", "maintenance", "contract"]
     if x in set(df["status_dashboard"].dropna().astype(str))
 ]
 
-status_labels = {
-    "booked": "Reservas (booked)",
-    "reserved": "Pré-reservas (reserved)",
-    "canceled": "Canceladas (canceled)",
-    "blocked": "Bloqueios (blocked)",
-    "maintenance": "Manutenção (maintenance)",
-    "contract": "Contratos (contract)",
-    "": "Sem status",
-}
+status_opcoes = ["Todos"] + status_disponiveis
 
-status_sel = st.sidebar.multiselect(
+status_sel = st.sidebar.selectbox(
     "Status da reserva",
-    status_disponiveis,
-    default=status_disponiveis,
-    format_func=lambda x: status_labels.get(x, x),
+    status_opcoes,
+    index=0,
+    format_func=lambda x: "Todos os status" if x == "Todos" else STATUS_LABELS.get(x, x),
 )
 
 aptos_disponiveis = sorted(df["codigo_apto"].dropna().unique())
@@ -785,12 +787,10 @@ if canais_sel:
         df_filtrado["canal"].isin(canais_sel)
     ]
 
-if status_sel:
+if status_sel != "Todos":
     df_filtrado = df_filtrado[
-        df_filtrado["status_dashboard"].isin(status_sel)
+        df_filtrado["status_dashboard"] == status_sel
     ]
-else:
-    df_filtrado = df_filtrado.iloc[0:0]
 
 if aptos_sel:
     df_filtrado = df_filtrado[
@@ -818,12 +818,10 @@ if canais_sel:
         df_comparacao["canal"].isin(canais_sel)
     ]
 
-if status_sel:
+if status_sel != "Todos":
     df_comparacao = df_comparacao[
-        df_comparacao["status_dashboard"].isin(status_sel)
+        df_comparacao["status_dashboard"] == status_sel
     ]
-else:
-    df_comparacao = df_comparacao.iloc[0:0]
 
 if aptos_sel:
     df_comparacao = df_comparacao[
@@ -862,7 +860,7 @@ anos_texto = ", ".join(
 st.markdown(
     f'<div style="color:#5E7894;font-size:0.78rem;'
     f'margin-bottom:10px;">'
-    f'Visão atual (check-in): {meses_texto or "nenhum mês"} • '
+    f'Visão atual: {meses_texto or "nenhum mês"} • '
     f'{anos_texto or "nenhum ano"}'
     f'</div>',
     unsafe_allow_html=True,
@@ -949,7 +947,7 @@ mensal = (
 if not mensal.empty:
 
     mensal["Ano"] = mensal["ano_num"].astype(int).astype(str)
-    mensal["Mês"] = mensal["mes_num"].astype(int)
+    mensal["Mês"] = mensal["mes_num"].astype(int).map(nomes_meses)
 
     grafico_mensal = mensal.pivot_table(
         index="Mês",
@@ -958,6 +956,10 @@ if not mensal.empty:
         aggfunc="sum",
         fill_value=0,
     )
+
+    # Mantém a ordem cronológica dos meses, mas exibe os nomes.
+    ordem_meses = [nomes_meses[x] for x in meses_selecionados]
+    grafico_mensal = grafico_mensal.reindex(ordem_meses, fill_value=0)
 
     # A série já usa CHECK-IN, inclusive para reservas futuras.
     # Portanto não somamos uma segunda vez as reservas futuras.
@@ -1876,6 +1878,51 @@ st.write(
 
 # ============================================================
 # 9. STATUS DAS RESERVAS
+# ============================================================
+
+st.markdown(
+    '<div class="tamu-section">9. Status das reservas</div>',
+    unsafe_allow_html=True,
+)
+
+# Esta seção mostra os tipos da Stays para o período/filtros selecionados.
+# "Reservas feitas" = type=booked. Canceladas = type=canceled.
+status_ordem = [
+    "booked",
+    "reserved",
+    "canceled",
+    "contract",
+    "blocked",
+    "maintenance",
+]
+
+status_contagem = (
+    df_filtrado["status_dashboard"]
+    .value_counts()
+    .to_dict()
+)
+
+status_visiveis = [
+    status for status in status_ordem
+    if status in status_contagem
+]
+
+if status_visiveis:
+    cols = st.columns(len(status_visiveis))
+    for col, status in zip(cols, status_visiveis):
+        col.metric(
+            STATUS_LABELS.get(status, status),
+            f"{int(status_contagem.get(status, 0)):,}".replace(",", "."),
+        )
+
+    st.caption(
+        "A contagem segue o campo type da API Stays e o período é definido pelo check-in. "
+        "Use o filtro lateral para exibir somente Reservas feitas ou Canceladas."
+    )
+else:
+    st.info("Nenhuma reserva com status disponível para os filtros selecionados.")
+
+
 # ============================================================
 
 st.markdown(
