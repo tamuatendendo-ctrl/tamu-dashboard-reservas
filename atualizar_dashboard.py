@@ -138,6 +138,7 @@ def consultar_periodo(
     inicio,
     fim,
     date_type="creation",
+    tipo=None,
 ):
 
     payload = {
@@ -145,6 +146,9 @@ def consultar_periodo(
         "to": fim.isoformat(),
         "dateType": date_type,
     }
+
+    if tipo:
+        payload["type"] = tipo
 
     ultimo_erro = None
 
@@ -432,71 +436,25 @@ def main():
     todas_reservas = {}
 
     # --------------------------------------------------------
-    # HISTÓRICO — DATA DE CRIAÇÃO
+    # BASE PRINCIPAL — DATA DE CHECK-IN (ARRIVAL)
     # --------------------------------------------------------
-
-    cursor = DATA_INICIO
-
-    while cursor <= DATA_FIM:
-
-        inicio = primeiro_dia_mes(
-            cursor
-        )
-
-        fim = min(
-            ultimo_dia_mes(cursor),
-            DATA_FIM,
-        )
-
-        reservas = consultar_periodo(
-            session,
-            inicio,
-            fim,
-            date_type="creation",
-        )
-
-        for reserva in reservas:
-
-            rid = id_reserva(
-                reserva
-            )
-
-            if rid:
-                todas_reservas[rid] = reserva
-
-        cursor = proximo_mes(
-            inicio
-        )
+    # A dashboard usa o mesmo critério do relatório de reservas
+    # da Stays: o período é determinado pelo check-in.
+    # Consultamos desde 2025 até 12 meses à frente.
 
     print()
     print(
-        f"Reservas únicas após histórico: "
-        f"{len(todas_reservas)}"
+        "Consultando reservas por check-in "
+        f"({DATA_INICIO} -> {DATA_FIM_FUTURO})"
     )
 
-    # --------------------------------------------------------
-    # FUTURO — DATA DE CHECK-IN (ARRIVAL)
-    # --------------------------------------------------------
-    #
-    # Esta segunda consulta é necessária porque a busca por
-    # creation não é suficiente para alimentar os meses futuros.
-    # A API Stays aceita dateType=arrival para buscar pela data
-    # de check-in.
-    #
-
-    print()
-    print(
-        "Consultando reservas futuras por check-in "
-        f"({DATA_INICIO_FUTURO} -> {DATA_FIM_FUTURO})"
-    )
-
-    cursor = primeiro_dia_mes(DATA_INICIO_FUTURO)
+    cursor = primeiro_dia_mes(DATA_INICIO)
 
     while cursor <= DATA_FIM_FUTURO:
 
         inicio = max(
             primeiro_dia_mes(cursor),
-            DATA_INICIO_FUTURO,
+            DATA_INICIO,
         )
 
         fim = min(
@@ -504,33 +462,68 @@ def main():
             DATA_FIM_FUTURO,
         )
 
-        reservas_futuras = consultar_periodo(
+        reservas_arrival = consultar_periodo(
             session,
             inicio,
             fim,
             date_type="arrival",
         )
 
-        for reserva in reservas_futuras:
-
-            rid = id_reserva(
-                reserva
-            )
-
-            if rid and rid not in todas_reservas:
+        for reserva in reservas_arrival:
+            rid = id_reserva(reserva)
+            if rid:
                 todas_reservas[rid] = reserva
 
-        cursor = proximo_mes(
-            cursor
-        )
+        cursor = proximo_mes(cursor)
 
-    reservas = list(
-        todas_reservas.values()
-    )
+    # --------------------------------------------------------
+    # CANCELADAS — TAMBÉM POR DATA DE CHECK-IN
+    # --------------------------------------------------------
+    # A API da Stays não inclui canceladas na consulta padrão.
+    # Elas precisam ser solicitadas explicitamente com type=canceled.
 
     print()
     print(
-        f"Reservas únicas após histórico + futuro: "
+        "Consultando canceladas por check-in "
+        f"({DATA_INICIO} -> {DATA_FIM_FUTURO})"
+    )
+
+    cursor = primeiro_dia_mes(DATA_INICIO)
+
+    while cursor <= DATA_FIM_FUTURO:
+
+        inicio = max(
+            primeiro_dia_mes(cursor),
+            DATA_INICIO,
+        )
+
+        fim = min(
+            ultimo_dia_mes(cursor),
+            DATA_FIM_FUTURO,
+        )
+
+        reservas_canceladas = consultar_periodo(
+            session,
+            inicio,
+            fim,
+            date_type="arrival",
+            tipo="canceled",
+        )
+
+        for reserva in reservas_canceladas:
+            rid = id_reserva(reserva)
+            if rid:
+                # Se uma reserva aparecer nas duas consultas,
+                # o estado cancelado deve prevalecer.
+                todas_reservas[rid] = reserva
+
+        cursor = proximo_mes(cursor)
+
+    reservas = list(todas_reservas.values())
+
+    print()
+    print(
+        f"Reservas únicas após check-in + canceladas: "
         f"{len(reservas)}"
     )
 
@@ -551,23 +544,26 @@ def main():
             codigo
         )
 
-        if not apartamento:
-
-            reservas_sem_apto.append({
-                "codigo_apto": codigo,
-                "canal": canal_reserva(
-                    reserva
-                ),
-                "id_reserva": id_reserva(
-                    reserva
-                ),
-            })
-
-            continue
-
         canal = canal_reserva(
             reserva
         )
+
+        # Reservas fora do cadastro mestre continuam na base geral,
+        # pois o total da dashboard deve reproduzir o total da Stays.
+        # Elas ficam marcadas para não contaminar os indicadores
+        # específicos dos 72 apartamentos.
+        if not apartamento:
+            reservas_sem_apto.append({
+                "codigo_apto": codigo,
+                "canal": canal,
+                "id_reserva": id_reserva(reserva),
+                "status": status_reserva(reserva),
+            })
+
+            apartamento = {
+                "codigo_apto": codigo,
+                "responsavel_apto": "Fora do cadastro",
+            }
 
         criacao = data_criacao(
             reserva
@@ -587,6 +583,8 @@ def main():
             ),
 
             "codigo_apto": codigo,
+
+            "no_cadastro_mestre": codigo in apt_por_codigo,
 
             "responsavel_apto":
                 apartamento.get(
@@ -744,7 +742,10 @@ def main():
                 ),
 
             "reservas_nossos_aptos":
-                len(linhas),
+                sum(1 for linha in linhas if linha.get("no_cadastro_mestre")),
+
+            "reservas_fora_cadastro":
+                sum(1 for linha in linhas if not linha.get("no_cadastro_mestre")),
 
             "reservas_sem_apto":
                 len(reservas_sem_apto),
