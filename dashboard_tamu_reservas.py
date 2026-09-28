@@ -1936,3 +1936,57 @@ st.caption(
     "Use o filtro lateral para selecionar individualmente Reservas feitas, "
     "Canceladas, Pré-reservas, Contratos, Bloqueios ou Manutenção."
 )
+
+# Quando um status específico é selecionado, mostramos os registros
+# diretamente de df_filtrado. Isso preserva a lógica dos indicadores
+# (que continuam sem canceladas/bloqueios/manutenção), mas permite
+# consultar os dados da reserva e do apartamento selecionado.
+if status_sel != "Todos":
+
+    st.subheader(
+        f"Detalhamento — {STATUS_LABELS.get(status_sel, status_sel)}"
+    )
+
+    detalhe_status = df_filtrado[
+        [
+            "id_reserva",
+            "codigo_apto",
+            "responsavel_apto",
+            "responsavel_reserva",
+            "canal",
+            "checkin",
+            "checkout",
+            "status_dashboard",
+        ]
+    ].copy()
+
+    detalhe_status = detalhe_status.rename(columns={
+        "id_reserva": "Reserva",
+        "codigo_apto": "Apartamento",
+        "responsavel_apto": "Responsável pelo apartamento",
+        "responsavel_reserva": "Responsável pela reserva",
+        "canal": "Canal",
+        "checkin": "Check-in",
+        "checkout": "Check-out",
+        "status_dashboard": "Status",
+    })
+
+    detalhe_status["Check-in"] = pd.to_datetime(
+        detalhe_status["Check-in"], errors="coerce"
+    ).dt.strftime("%d/%m/%Y")
+    detalhe_status["Check-out"] = pd.to_datetime(
+        detalhe_status["Check-out"], errors="coerce"
+    ).dt.strftime("%d/%m/%Y")
+
+    detalhe_status["Status"] = detalhe_status["Status"].replace(
+        STATUS_LABELS
+    )
+
+    st.dataframe(
+        detalhe_status.sort_values(
+            ["Check-in", "Apartamento"],
+            na_position="last",
+        ),
+        use_container_width=True,
+        hide_index=True,
+    )
