@@ -12,9 +12,9 @@
     "reservas_nossos_aptos": 7265,
     "reservas_fora_cadastro": 1812,
     "reservas_sem_apto": 1812,
-    "reservas_booked": 8375,
+    "reservas_booked": 8374,
     "reservas_reserved": 1,
-    "reservas_canceled": 701,
+    "reservas_canceled": 702,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
   },
@@ -116080,20 +116080,6 @@
       "tipo": "booked"
     },
     {
-      "id_reserva": "6a9855aee9b9416d8b6570db",
-      "codigo_apto": "161121",
-      "no_cadastro_mestre": true,
-      "responsavel_apto": "Evellyn",
-      "responsavel_reserva": "Evellyn",
-      "canal": "Booking",
-      "ano": "2026",
-      "mes": "2026-09",
-      "checkin": "2026-11-03",
-      "checkout": "2026-11-06",
-      "status": "booked",
-      "tipo": "booked"
-    },
-    {
       "id_reserva": "6abd9d412217b0deb5b851f2",
       "codigo_apto": "161110",
       "no_cadastro_mestre": true,
@@ -126954,6 +126940,20 @@
       "mes": "2026-09",
       "checkin": "2026-11-04",
       "checkout": "2026-11-16",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
+      "id_reserva": "6a9855aee9b9416d8b6570db",
+      "codigo_apto": "161121",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Evellyn",
+      "responsavel_reserva": "Evellyn",
+      "canal": "Booking",
+      "ano": "2026",
+      "mes": "2026-09",
+      "checkin": "2026-11-03",
+      "checkout": "2026-11-06",
       "status": "canceled",
       "tipo": "canceled"
     },
