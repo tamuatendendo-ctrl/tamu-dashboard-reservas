@@ -12,9 +12,9 @@
     "reservas_nossos_aptos": 7265,
     "reservas_fora_cadastro": 1812,
     "reservas_sem_apto": 1812,
-    "reservas_booked": 8376,
+    "reservas_booked": 8375,
     "reservas_reserved": 1,
-    "reservas_canceled": 700,
+    "reservas_canceled": 701,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
   },
@@ -115786,20 +115786,6 @@
       "tipo": "booked"
     },
     {
-      "id_reserva": "6ac1944991648a4e96bea8ff",
-      "codigo_apto": "161117",
-      "no_cadastro_mestre": true,
-      "responsavel_apto": "Thiago",
-      "responsavel_reserva": "Thiago",
-      "canal": "Airbnb",
-      "ano": "2026",
-      "mes": "2026-10",
-      "checkin": "2026-11-08",
-      "checkout": "2026-11-13",
-      "status": "booked",
-      "tipo": "booked"
-    },
-    {
       "id_reserva": "6abbe3c73e450a83a81e4ed5",
       "codigo_apto": "161110",
       "no_cadastro_mestre": true,
@@ -126912,6 +126898,20 @@
       "mes": "2026-09",
       "checkin": "2026-11-12",
       "checkout": "2026-11-16",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
+      "id_reserva": "6ac1944991648a4e96bea8ff",
+      "codigo_apto": "161117",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-11-08",
+      "checkout": "2026-11-13",
       "status": "canceled",
       "tipo": "canceled"
     },
