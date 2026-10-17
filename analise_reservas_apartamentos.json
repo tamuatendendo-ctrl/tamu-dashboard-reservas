@@ -7,13 +7,13 @@
     "atualizado_em": "2026-10-17"
   },
   "totais": {
-    "reservas_historico": 9265,
-    "reservas_futuras_checkin": 403,
-    "reservas_nossos_aptos": 7453,
+    "reservas_historico": 9267,
+    "reservas_futuras_checkin": 405,
+    "reservas_nossos_aptos": 7455,
     "reservas_fora_cadastro": 1812,
     "reservas_sem_apto": 1812,
-    "reservas_booked": 8539,
-    "reservas_reserved": 2,
+    "reservas_booked": 8542,
+    "reservas_reserved": 1,
     "reservas_canceled": 724,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
@@ -113238,6 +113238,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6ad2ddb6e6164eb3620933c5",
+      "codigo_apto": "161146",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-10-20",
+      "checkout": "2026-10-24",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6ad2b276560c9557bb9bb4d5",
       "codigo_apto": "161131",
       "no_cadastro_mestre": true,
@@ -113528,8 +113542,8 @@
       "mes": "2026-10",
       "checkin": "2026-10-17",
       "checkout": "2026-10-21",
-      "status": "reserved",
-      "tipo": "reserved"
+      "status": "booked",
+      "tipo": "booked"
     },
     {
       "id_reserva": "6ad1847e6d5ceb143917e706",
@@ -118344,6 +118358,20 @@
       "mes": "2026-09",
       "checkin": "2026-12-25",
       "checkout": "2027-01-02",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
+      "id_reserva": "6ad2d88429d4c704ab423289",
+      "codigo_apto": "161146",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-12-19",
+      "checkout": "2026-12-23",
       "status": "booked",
       "tipo": "booked"
     },
@@ -129915,9 +129943,9 @@
       "codigo_apto": "161146",
       "responsavel_apto": "Thiago",
       "reservas_2025": 96,
-      "reservas_2026": 73,
-      "reservas_total": 169,
-      "airbnb": 167,
+      "reservas_2026": 75,
+      "reservas_total": 171,
+      "airbnb": 169,
       "booking": 0,
       "website": 1,
       "outro": 0,
