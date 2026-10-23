@@ -7,14 +7,14 @@
     "atualizado_em": "2026-10-23"
   },
   "totais": {
-    "reservas_historico": 9351,
-    "reservas_futuras_checkin": 409,
+    "reservas_historico": 9354,
+    "reservas_futuras_checkin": 412,
     "reservas_nossos_aptos": 7531,
-    "reservas_fora_cadastro": 1820,
-    "reservas_sem_apto": 1820,
-    "reservas_booked": 8615,
+    "reservas_fora_cadastro": 1823,
+    "reservas_sem_apto": 1823,
+    "reservas_booked": 8616,
     "reservas_reserved": 1,
-    "reservas_canceled": 735,
+    "reservas_canceled": 737,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
   },
@@ -112412,6 +112412,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6adb583c48b01e540d588936",
+      "codigo_apto": "161202",
+      "no_cadastro_mestre": false,
+      "responsavel_apto": "Fora do cadastro",
+      "responsavel_reserva": "Fora do cadastro",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-10-30",
+      "checkout": "2026-11-02",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6adaa1d92bbe2ee80a973f63",
       "codigo_apto": "161195",
       "no_cadastro_mestre": false,
@@ -113010,6 +113024,20 @@
       "mes": "2026-09",
       "checkin": "2026-10-24",
       "checkout": "2026-10-27",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
+      "id_reserva": "6adb56815320f28ce381751d",
+      "codigo_apto": "161202",
+      "no_cadastro_mestre": false,
+      "responsavel_apto": "Fora do cadastro",
+      "responsavel_reserva": "Fora do cadastro",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-10-23",
+      "checkout": "2026-10-25",
       "status": "booked",
       "tipo": "booked"
     },
@@ -116822,20 +116850,6 @@
       "tipo": "booked"
     },
     {
-      "id_reserva": "6ada271e3e064ee06e330c48",
-      "codigo_apto": "161147",
-      "no_cadastro_mestre": true,
-      "responsavel_apto": "Evellyn",
-      "responsavel_reserva": "Evellyn",
-      "canal": "Airbnb",
-      "ano": "2026",
-      "mes": "2026-10",
-      "checkin": "2026-11-27",
-      "checkout": "2026-12-01",
-      "status": "booked",
-      "tipo": "booked"
-    },
-    {
       "id_reserva": "6ad39360804aeb185c257135",
       "codigo_apto": "161171A",
       "no_cadastro_mestre": true,
@@ -118782,16 +118796,16 @@
       "tipo": "booked"
     },
     {
-      "id_reserva": "6ad2c08839592366cfc34e0a",
-      "codigo_apto": "161151",
-      "no_cadastro_mestre": true,
-      "responsavel_apto": "Thiago",
-      "responsavel_reserva": "Thiago",
+      "id_reserva": "6adb66c52ca57a0a69ac2a31",
+      "codigo_apto": "161195",
+      "no_cadastro_mestre": false,
+      "responsavel_apto": "Fora do cadastro",
+      "responsavel_reserva": "Fora do cadastro",
       "canal": "Airbnb",
       "ano": "2026",
       "mes": "2026-10",
       "checkin": "2026-12-30",
-      "checkout": "2027-01-04",
+      "checkout": "2027-01-08",
       "status": "booked",
       "tipo": "booked"
     },
@@ -130458,6 +130472,20 @@
       "tipo": "canceled"
     },
     {
+      "id_reserva": "6ada271e3e064ee06e330c48",
+      "codigo_apto": "161147",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Evellyn",
+      "responsavel_reserva": "Evellyn",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-11-27",
+      "checkout": "2026-12-01",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
       "id_reserva": "6ac5b99d8a391f4d4f49ae35",
       "codigo_apto": "161103B",
       "no_cadastro_mestre": true,
@@ -130678,6 +130706,20 @@
       "mes": "2026-08",
       "checkin": "2026-11-02",
       "checkout": "2026-11-08",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
+      "id_reserva": "6ad2c08839592366cfc34e0a",
+      "codigo_apto": "161151",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-12-30",
+      "checkout": "2027-01-04",
       "status": "canceled",
       "tipo": "canceled"
     },
@@ -141882,9 +141924,21 @@
       "status": "booked"
     },
     {
+      "codigo_apto": "161202",
+      "canal": "Airbnb",
+      "id_reserva": "6adb583c48b01e540d588936",
+      "status": "booked"
+    },
+    {
       "codigo_apto": "161195",
       "canal": "Airbnb",
       "id_reserva": "6adaa1d92bbe2ee80a973f63",
+      "status": "booked"
+    },
+    {
+      "codigo_apto": "161202",
+      "canal": "Airbnb",
+      "id_reserva": "6adb56815320f28ce381751d",
       "status": "booked"
     },
     {
@@ -141927,6 +141981,12 @@
       "codigo_apto": "161195",
       "canal": "Airbnb",
       "id_reserva": "6ada9edaec99a052a827f179",
+      "status": "booked"
+    },
+    {
+      "codigo_apto": "161195",
+      "canal": "Airbnb",
+      "id_reserva": "6adb66c52ca57a0a69ac2a31",
       "status": "booked"
     },
     {
