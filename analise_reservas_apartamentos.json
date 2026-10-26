@@ -7,14 +7,14 @@
     "atualizado_em": "2026-10-26"
   },
   "totais": {
-    "reservas_historico": 9383,
-    "reservas_futuras_checkin": 404,
-    "reservas_nossos_aptos": 7557,
+    "reservas_historico": 9385,
+    "reservas_futuras_checkin": 406,
+    "reservas_nossos_aptos": 7559,
     "reservas_fora_cadastro": 1826,
     "reservas_sem_apto": 1826,
-    "reservas_booked": 8643,
+    "reservas_booked": 8644,
     "reservas_reserved": 1,
-    "reservas_canceled": 739,
+    "reservas_canceled": 740,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
   },
@@ -112902,6 +112902,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6adf3e14014b2d48055cd6c2",
+      "codigo_apto": "161024",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-10-27",
+      "checkout": "2026-10-30",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6ade2faf8cb27924670ea7c4",
       "codigo_apto": "161189",
       "no_cadastro_mestre": true,
@@ -119062,6 +119076,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6adf22379ac7385c86b0b8cc",
+      "codigo_apto": "161131",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Evellyn",
+      "responsavel_reserva": "Evellyn",
+      "canal": "Booking",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-12-30",
+      "checkout": "2027-01-02",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6adbdedd2d4a4d6efe331de4",
       "codigo_apto": "161151",
       "no_cadastro_mestre": true,
@@ -119436,20 +119464,6 @@
       "mes": "2026-09",
       "checkin": "2026-12-28",
       "checkout": "2027-01-06",
-      "status": "booked",
-      "tipo": "booked"
-    },
-    {
-      "id_reserva": "699420186f26dd3be6b9f7df",
-      "codigo_apto": "161131",
-      "no_cadastro_mestre": true,
-      "responsavel_apto": "Evellyn",
-      "responsavel_reserva": "Evellyn",
-      "canal": "Booking",
-      "ano": "2026",
-      "mes": "2026-02",
-      "checkin": "2026-12-28",
-      "checkout": "2027-01-02",
       "status": "booked",
       "tipo": "booked"
     },
@@ -131158,6 +131172,20 @@
       "tipo": "canceled"
     },
     {
+      "id_reserva": "699420186f26dd3be6b9f7df",
+      "codigo_apto": "161131",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Evellyn",
+      "responsavel_reserva": "Evellyn",
+      "canal": "Booking",
+      "ano": "2026",
+      "mes": "2026-02",
+      "checkin": "2026-12-28",
+      "checkout": "2027-01-02",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
       "id_reserva": "6ab52b39923a21b3f6179b91",
       "codigo_apto": "161103B",
       "no_cadastro_mestre": true,
@@ -131411,9 +131439,9 @@
       "codigo_apto": "161024",
       "responsavel_apto": "Thiago",
       "reservas_2025": 96,
-      "reservas_2026": 91,
-      "reservas_total": 190,
-      "airbnb": 179,
+      "reservas_2026": 92,
+      "reservas_total": 191,
+      "airbnb": 180,
       "booking": 11,
       "website": 0,
       "outro": 0,
@@ -131951,10 +131979,10 @@
       "codigo_apto": "161131",
       "responsavel_apto": "Evellyn",
       "reservas_2025": 98,
-      "reservas_2026": 83,
-      "reservas_total": 191,
+      "reservas_2026": 84,
+      "reservas_total": 192,
       "airbnb": 168,
-      "booking": 22,
+      "booking": 23,
       "website": 1,
       "outro": 0,
       "sem_canal": 0
