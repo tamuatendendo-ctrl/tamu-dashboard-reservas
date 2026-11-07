@@ -7,14 +7,14 @@
     "atualizado_em": "2026-11-07"
   },
   "totais": {
-    "reservas_historico": 9761,
-    "reservas_futuras_checkin": 421,
-    "reservas_nossos_aptos": 7696,
+    "reservas_historico": 9763,
+    "reservas_futuras_checkin": 423,
+    "reservas_nossos_aptos": 7698,
     "reservas_fora_cadastro": 2065,
     "reservas_sem_apto": 2065,
-    "reservas_booked": 8958,
+    "reservas_booked": 8959,
     "reservas_reserved": 2,
-    "reservas_canceled": 801,
+    "reservas_canceled": 802,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
   },
@@ -121596,6 +121596,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6aeee8942dc18ade3e7bc200",
+      "codigo_apto": "161179",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-11-07",
+      "checkout": "2026-11-09",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6aee2c16b743764fcd59038c",
       "codigo_apto": "161192",
       "no_cadastro_mestre": true,
@@ -135862,6 +135876,20 @@
       "tipo": "canceled"
     },
     {
+      "id_reserva": "6aeec8c2b66537bc64e0e6c9",
+      "codigo_apto": "161179",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-11-07",
+      "checkout": "2026-11-09",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
       "id_reserva": "6adb22a308b4f49d4d84904d",
       "codigo_apto": "161202",
       "no_cadastro_mestre": false,
@@ -137027,9 +137055,9 @@
       "codigo_apto": "161179",
       "responsavel_apto": "Thiago",
       "reservas_2025": 0,
-      "reservas_2026": 45,
-      "reservas_total": 45,
-      "airbnb": 44,
+      "reservas_2026": 47,
+      "reservas_total": 47,
+      "airbnb": 46,
       "booking": 1,
       "website": 0,
       "outro": 0,
