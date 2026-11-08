@@ -4,17 +4,17 @@
     "airbnb_responsavel": "responsavel_apto",
     "outros_canais": "Não definido",
     "apartamentos_considerados": 72,
-    "atualizado_em": "2026-11-07"
+    "atualizado_em": "2026-11-08"
   },
   "totais": {
     "reservas_historico": 9768,
-    "reservas_futuras_checkin": 428,
+    "reservas_futuras_checkin": 415,
     "reservas_nossos_aptos": 7702,
     "reservas_fora_cadastro": 2066,
     "reservas_sem_apto": 2066,
-    "reservas_booked": 8961,
+    "reservas_booked": 8960,
     "reservas_reserved": 3,
-    "reservas_canceled": 804,
+    "reservas_canceled": 805,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
   },
@@ -121997,7 +121997,7 @@
       "ano": "2026",
       "mes": "2026-10",
       "checkin": "2026-11-06",
-      "checkout": "2026-11-08",
+      "checkout": "2026-11-09",
       "status": "booked",
       "tipo": "booked"
     },
@@ -123160,20 +123160,6 @@
       "mes": "2026-09",
       "checkin": "2026-12-30",
       "checkout": "2027-01-02",
-      "status": "booked",
-      "tipo": "booked"
-    },
-    {
-      "id_reserva": "6ac96eff3ee307a530ea3b97",
-      "codigo_apto": "161146",
-      "no_cadastro_mestre": true,
-      "responsavel_apto": "Thiago",
-      "responsavel_reserva": "Thiago",
-      "canal": "Airbnb",
-      "ano": "2026",
-      "mes": "2026-10",
-      "checkin": "2026-12-29",
-      "checkout": "2027-01-04",
       "status": "booked",
       "tipo": "booked"
     },
@@ -136151,6 +136137,20 @@
       "ano": "2026",
       "mes": "2026-09",
       "checkin": "2026-12-30",
+      "checkout": "2027-01-04",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
+      "id_reserva": "6ac96eff3ee307a530ea3b97",
+      "codigo_apto": "161146",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-10",
+      "checkin": "2026-12-29",
       "checkout": "2027-01-04",
       "status": "canceled",
       "tipo": "canceled"
