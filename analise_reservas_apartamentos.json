@@ -7,12 +7,12 @@
     "atualizado_em": "2026-11-13"
   },
   "totais": {
-    "reservas_historico": 9856,
-    "reservas_futuras_checkin": 439,
-    "reservas_nossos_aptos": 7781,
+    "reservas_historico": 9857,
+    "reservas_futuras_checkin": 440,
+    "reservas_nossos_aptos": 7782,
     "reservas_fora_cadastro": 2075,
     "reservas_sem_apto": 2075,
-    "reservas_booked": 9034,
+    "reservas_booked": 9035,
     "reservas_reserved": 1,
     "reservas_canceled": 821,
     "reservas_blocked": 0,
@@ -124844,6 +124844,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6af67dbe9a7e12068c7eb38d",
+      "codigo_apto": "161027",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Evellyn",
+      "responsavel_reserva": "Evellyn",
+      "canal": "Booking",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-12-07",
+      "checkout": "2026-12-11",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6af34f31c71f7d731c397197",
       "codigo_apto": "161166B",
       "no_cadastro_mestre": true,
@@ -138477,10 +138491,10 @@
       "codigo_apto": "161027",
       "responsavel_apto": "Evellyn",
       "reservas_2025": 96,
-      "reservas_2026": 65,
-      "reservas_total": 166,
+      "reservas_2026": 66,
+      "reservas_total": 167,
       "airbnb": 160,
-      "booking": 2,
+      "booking": 3,
       "website": 1,
       "outro": 0,
       "sem_canal": 3
