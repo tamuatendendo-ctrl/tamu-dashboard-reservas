@@ -4,17 +4,17 @@
     "airbnb_responsavel": "responsavel_apto",
     "outros_canais": "Não definido",
     "apartamentos_considerados": 72,
-    "atualizado_em": "2026-11-13"
+    "atualizado_em": "2026-11-14"
   },
   "totais": {
-    "reservas_historico": 9864,
-    "reservas_futuras_checkin": 447,
-    "reservas_nossos_aptos": 7787,
-    "reservas_fora_cadastro": 2077,
-    "reservas_sem_apto": 2077,
-    "reservas_booked": 9040,
+    "reservas_historico": 9867,
+    "reservas_futuras_checkin": 425,
+    "reservas_nossos_aptos": 7789,
+    "reservas_fora_cadastro": 2078,
+    "reservas_sem_apto": 2078,
+    "reservas_booked": 9041,
     "reservas_reserved": 1,
-    "reservas_canceled": 823,
+    "reservas_canceled": 825,
     "reservas_blocked": 0,
     "reservas_maintenance": 0
   },
@@ -124676,6 +124676,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6af7929280af534948685a9d",
+      "codigo_apto": "161108",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Thiago",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-12-10",
+      "checkout": "2026-12-15",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6aeb74b91e5be38ffdd055b3",
       "codigo_apto": "161173A",
       "no_cadastro_mestre": false,
@@ -126174,7 +126188,7 @@
       "tipo": "booked"
     },
     {
-      "id_reserva": "6aefda5b2f7e75ed0f56ada7",
+      "id_reserva": "6af7ab015ef9b85dc054706e",
       "codigo_apto": "161195",
       "no_cadastro_mestre": false,
       "responsavel_apto": "Fora do cadastro",
@@ -137710,6 +137724,20 @@
       "tipo": "canceled"
     },
     {
+      "id_reserva": "6af7a7675ef9b85dc0519235",
+      "codigo_apto": "161171A",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Evellyn",
+      "responsavel_reserva": "Evellyn",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-12-05",
+      "checkout": "2026-12-07",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
       "id_reserva": "6ae5db5447b339052310a96f",
       "codigo_apto": "161137A",
       "no_cadastro_mestre": false,
@@ -137990,6 +138018,20 @@
       "tipo": "canceled"
     },
     {
+      "id_reserva": "6aefda5b2f7e75ed0f56ada7",
+      "codigo_apto": "161195",
+      "no_cadastro_mestre": false,
+      "responsavel_apto": "Fora do cadastro",
+      "responsavel_reserva": "Fora do cadastro",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2027-02-05",
+      "checkout": "2027-02-10",
+      "status": "canceled",
+      "tipo": "canceled"
+    },
+    {
       "id_reserva": "6ae49e719b6eaa15549e7067",
       "codigo_apto": "161195",
       "no_cadastro_mestre": false,
@@ -138169,9 +138211,9 @@
       "codigo_apto": "161108",
       "responsavel_apto": "Thiago",
       "reservas_2025": 96,
-      "reservas_2026": 96,
-      "reservas_total": 199,
-      "airbnb": 194,
+      "reservas_2026": 97,
+      "reservas_total": 200,
+      "airbnb": 195,
       "booking": 3,
       "website": 0,
       "outro": 0,
@@ -138841,9 +138883,9 @@
       "codigo_apto": "161171A",
       "responsavel_apto": "Evellyn",
       "reservas_2025": 0,
-      "reservas_2026": 25,
-      "reservas_total": 25,
-      "airbnb": 25,
+      "reservas_2026": 26,
+      "reservas_total": 26,
+      "airbnb": 26,
       "booking": 0,
       "website": 0,
       "outro": 0,
@@ -150440,7 +150482,7 @@
     {
       "codigo_apto": "161195",
       "canal": "Airbnb",
-      "id_reserva": "6aefda5b2f7e75ed0f56ada7",
+      "id_reserva": "6af7ab015ef9b85dc054706e",
       "status": "booked"
     },
     {
@@ -151431,6 +151473,12 @@
       "codigo_apto": "161132A",
       "canal": "Airbnb",
       "id_reserva": "6af3934ec784521cfe3d592a",
+      "status": "canceled"
+    },
+    {
+      "codigo_apto": "161195",
+      "canal": "Airbnb",
+      "id_reserva": "6aefda5b2f7e75ed0f56ada7",
       "status": "canceled"
     },
     {
