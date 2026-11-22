@@ -7,12 +7,12 @@
     "atualizado_em": "2026-11-22"
   },
   "totais": {
-    "reservas_historico": 9976,
-    "reservas_futuras_checkin": 396,
+    "reservas_historico": 9977,
+    "reservas_futuras_checkin": 397,
     "reservas_nossos_aptos": 7872,
-    "reservas_fora_cadastro": 2104,
-    "reservas_sem_apto": 2104,
-    "reservas_booked": 9131,
+    "reservas_fora_cadastro": 2105,
+    "reservas_sem_apto": 2105,
+    "reservas_booked": 9132,
     "reservas_reserved": 1,
     "reservas_canceled": 844,
     "reservas_blocked": 0,
@@ -120275,7 +120275,7 @@
       "ano": "2026",
       "mes": "2026-10",
       "checkin": "2026-11-22",
-      "checkout": "2026-11-26",
+      "checkout": "2026-11-23",
       "status": "booked",
       "tipo": "booked"
     },
@@ -120905,7 +120905,7 @@
       "ano": "2026",
       "mes": "2026-11",
       "checkin": "2026-11-19",
-      "checkout": "2026-11-23",
+      "checkout": "2026-11-24",
       "status": "booked",
       "tipo": "booked"
     },
@@ -125008,6 +125008,20 @@
       "mes": "2026-11",
       "checkin": "2026-12-20",
       "checkout": "2026-12-24",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
+      "id_reserva": "6b03739e65a456708c2dc055",
+      "codigo_apto": "161173A",
+      "no_cadastro_mestre": false,
+      "responsavel_apto": "Fora do cadastro",
+      "responsavel_reserva": "Fora do cadastro",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-12-19",
+      "checkout": "2026-12-23",
       "status": "booked",
       "tipo": "booked"
     },
@@ -151961,6 +151975,12 @@
       "codigo_apto": "161132A",
       "canal": "Airbnb",
       "id_reserva": "6ae4e73cd2d1d11ecb54ea61",
+      "status": "booked"
+    },
+    {
+      "codigo_apto": "161173A",
+      "canal": "Airbnb",
+      "id_reserva": "6b03739e65a456708c2dc055",
       "status": "booked"
     },
     {
