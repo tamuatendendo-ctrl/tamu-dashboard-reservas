@@ -4,15 +4,15 @@
     "airbnb_responsavel": "responsavel_apto",
     "outros_canais": "Não definido",
     "apartamentos_considerados": 72,
-    "atualizado_em": "2026-11-22"
+    "atualizado_em": "2026-11-23"
   },
   "totais": {
-    "reservas_historico": 9977,
-    "reservas_futuras_checkin": 397,
-    "reservas_nossos_aptos": 7872,
-    "reservas_fora_cadastro": 2105,
-    "reservas_sem_apto": 2105,
-    "reservas_booked": 9132,
+    "reservas_historico": 9979,
+    "reservas_futuras_checkin": 383,
+    "reservas_nossos_aptos": 7873,
+    "reservas_fora_cadastro": 2106,
+    "reservas_sem_apto": 2106,
+    "reservas_booked": 9134,
     "reservas_reserved": 1,
     "reservas_canceled": 844,
     "reservas_blocked": 0,
@@ -119860,6 +119860,20 @@
       "tipo": "booked"
     },
     {
+      "id_reserva": "6b038308f10f01925b17a890",
+      "codigo_apto": "161173A",
+      "no_cadastro_mestre": false,
+      "responsavel_apto": "Fora do cadastro",
+      "responsavel_reserva": "Fora do cadastro",
+      "canal": "Airbnb",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-11-25",
+      "checkout": "2026-11-28",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
       "id_reserva": "6afbe1a886b8b303e5532a65",
       "codigo_apto": "161166B",
       "no_cadastro_mestre": true,
@@ -124405,6 +124419,20 @@
       "ano": "2026",
       "mes": "2026-09",
       "checkin": "2026-12-31",
+      "checkout": "2027-01-05",
+      "status": "booked",
+      "tipo": "booked"
+    },
+    {
+      "id_reserva": "6b03cd52f5785828ae518ce9",
+      "codigo_apto": "161179",
+      "no_cadastro_mestre": true,
+      "responsavel_apto": "Thiago",
+      "responsavel_reserva": "Evellyn",
+      "canal": "Booking",
+      "ano": "2026",
+      "mes": "2026-11",
+      "checkin": "2026-12-30",
       "checkout": "2027-01-05",
       "status": "booked",
       "tipo": "booked"
@@ -140051,10 +140079,10 @@
       "codigo_apto": "161179",
       "responsavel_apto": "Thiago",
       "reservas_2025": 0,
-      "reservas_2026": 49,
-      "reservas_total": 49,
+      "reservas_2026": 50,
+      "reservas_total": 50,
       "airbnb": 48,
-      "booking": 1,
+      "booking": 2,
       "website": 0,
       "outro": 0,
       "sem_canal": 0
@@ -151681,6 +151709,12 @@
       "codigo_apto": "161137A",
       "canal": "Airbnb",
       "id_reserva": "6ae57578671970720a1a712d",
+      "status": "booked"
+    },
+    {
+      "codigo_apto": "161173A",
+      "canal": "Airbnb",
+      "id_reserva": "6b038308f10f01925b17a890",
       "status": "booked"
     },
     {
